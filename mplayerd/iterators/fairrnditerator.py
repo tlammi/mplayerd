@@ -24,13 +24,16 @@ class FairRndIterator(iteratorbase.IteratorBase):
         return cls(playlist)
 
     def __next__(self):
+        if len(self._top_bin) == 0:
+            raise StopIteration()
+
         max_shows = max([i.showings for i in self._top_bin])
         weights = [max_shows - i.showings + 1 for i in self._top_bin]
         index = random.choices(self._indexes, weights)[0]
         self._top_bin[index].showings += 1
         rnd_elem = self._top_bin[index]
-
-        self._top_bin[index] = self._bottom_bin.popleft()
-        self._bottom_bin.append(rnd_elem)
+        if len(self._bottom_bin) > 0:
+            self._top_bin[index] = self._bottom_bin.popleft()
+            self._bottom_bin.append(rnd_elem)
 
         return rnd_elem.item

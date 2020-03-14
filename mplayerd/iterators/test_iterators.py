@@ -26,12 +26,24 @@ def test_two(itertype):
         except StopIteration:
             pass
 
+
 @pytest.mark.parametrize("itertype", [
     LoopIterator, FairRndIterator
 ])
 def test_one(itertype):
     it = itertype.from_list([1])
     for i in range(100):
+        try:
+            next(it)
+        except StopIteration:
+            pass
+
+@pytest.mark.parametrize("itertype", [
+    LoopIterator, FairRndIterator
+])
+def test_zero(itertype):
+    it = itertype.from_list([])
+    for i in range(1000):
         try:
             next(it)
         except StopIteration:
