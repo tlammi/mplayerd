@@ -1,12 +1,19 @@
 from media import MediaPlayer, Media
 import time
 import threading
+import glob
 
-FILES = [
-    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2433.JPG", {"image-duration": "2.0"}),
-    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2435.JPG", {"image-duration": "3.0"}),
-    Media(r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4")
-]
+FILES = glob.glob(r"G:\googledrive\**", recursive=True)
+
+FILES = [f for f in FILES if f.endswith(".jpg")]
+FILES = [Media(f, {"image-duration": "2.0"}) for f in FILES]
+print(FILES)
+
+#FILES = [
+#    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2433.JPG", {"image-duration": "2.0"}),
+#    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2435.JPG", {"image-duration": "3.0"}),
+#    Media(r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4")
+#]
 
 FILES2 = [
     r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4"

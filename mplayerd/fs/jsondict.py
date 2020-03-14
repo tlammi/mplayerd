@@ -45,3 +45,23 @@ class JsonDict:
 
     def __delitem__(self, key):
         del self._d[key]
+
+    def __str__(self):
+        return str(self._d)
+
+    def __repr__(self):
+        keyvalues = []
+        for k, v in self._d.items():
+            tmp = f"{k}="
+            if isinstance(v, dict):
+                tmp += "{...}"
+            elif isinstance(v, list):
+                tmp += "[...]"
+            elif isinstance(v, str):
+                tmp += f'"{v}"'
+            else:
+                tmp += str(v)
+
+            keyvalues.append(tmp)
+        keystr = ", ".join(keyvalues)
+        return f"{{{keystr}}}"
