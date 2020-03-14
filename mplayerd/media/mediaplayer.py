@@ -3,14 +3,14 @@ import tkinter
 import threading
 import time
 from .playlist import Playlist
+from .mediapipe import LoopMediaPipe
 
 
 class MediaPlayer:
 
     def __init__(self, initial_playlist: Playlist):
         self._start = time.time()
-        self._sem = threading.Semaphore(1)
-        self._current_plist = initial_playlist
+        self._iter = iter(LoopMediaPipe.from_playlist(initial_playlist))
         self._root = tkinter.Tk()
         self._root.title("Media Player Daemon")
 
@@ -29,11 +29,11 @@ class MediaPlayer:
     def settings(self):
         pass
 
-    def playlist(self):
-        return self._current_plist
+    def playlist_append(self, val):
+        pass
 
-    def change_playlist(self, new_playlist: Playlist):
-        self._current_plist = new_playlist
+    def playlist_replace(self, new_playlist: Playlist):
+        self._iter = LoopMediaPipe.from_playlist(new_playlist)
 
     def run_forever(self):
         self._root.after(0, self._main_task)
@@ -52,9 +52,8 @@ class MediaPlayer:
             raise ValueError("non-zero return value")
 
     def _next_vlc_media(self):
-        media = self._current_plist[self._index]
+        media = next(self._iter)
         vlc_media = self._inst.media_new(media.file, *media.options)
-        self._index = (self._index + 1) % len(self._current_plist)
         return vlc_media
 
     def _media_ended_callback(self, _):
