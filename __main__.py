@@ -12,16 +12,3 @@ i = 0
 
 
 player.run_forever()
-
-"""
-def task():
-    global player
-    global i
-    player.play(FILES[i])
-    i = (i+1) % len(FILES)
-    root.after(2000, task)
-
-
-root.after(2000, task)
-root.mainloop()
-"""
