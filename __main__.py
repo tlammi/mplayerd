@@ -1,21 +1,21 @@
-from mplayerd.media import MediaPlayer, Playlist
+from mplayerd.media import MediaPlayer, Playlist, Media
 import time
 import threading
 
 FILES = [
-    (r"C:\Users\Toni\Dropbox\Kuvat\JA7_2433.JPG", {"image-duration": "2.0"}),
-    (r"C:\Users\Toni\Dropbox\Kuvat\JA7_2435.JPG", {"image-duration": "3.0"}),
-    r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4"
+    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2433.JPG", {"image-duration": "2.0"}),
+    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2435.JPG", {"image-duration": "3.0"}),
+    Media(r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4")
 ]
 
 FILES2 = [
     r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4"
 ]
 
-plist = Playlist(FILES)
-player = MediaPlayer(plist)
+#plist = Playlist(FILES)
+player = MediaPlayer(FILES)
 
-
+"""
 def thread(p: MediaPlayer):
     i = 0
     while True:
@@ -30,5 +30,5 @@ def thread(p: MediaPlayer):
 
 t = threading.Thread(target=thread, args=(player,), daemon=True)
 t.start()
-
+"""
 player.run_forever()

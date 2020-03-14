@@ -3,15 +3,16 @@ import tkinter
 import threading
 import time
 from .playlist import Playlist
-from .mediapipe import LoopMediaPipe
+from .mediapipe import LoopMediaPipe, FairRndMediaPipe
 
 
 class MediaPlayer:
 
-    def __init__(self, initial_playlist: Playlist):
+    def __init__(self, initial_playlist: list):
         self._start = time.time()
         self._media_lock = threading.Lock()
-        self._iter = iter(LoopMediaPipe.from_playlist(initial_playlist))
+        #self._iter = iter(LoopMediaPipe.from_playlist(initial_playlist))
+        self._iter = iter(FairRndMediaPipe.from_playlist(initial_playlist))
         self._root = tkinter.Tk()
         self._root.title("Media Player Daemon")
 
