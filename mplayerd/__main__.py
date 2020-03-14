@@ -1,4 +1,4 @@
-from mplayerd.media import MediaPlayer, Playlist, Media
+from media import MediaPlayer, Media
 import time
 import threading
 

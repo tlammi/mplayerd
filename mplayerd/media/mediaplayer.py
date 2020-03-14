@@ -2,8 +2,7 @@ import vlc
 import tkinter
 import threading
 import time
-from .playlist import Playlist
-from .mediapipe import LoopMediaPipe, FairRndMediaPipe
+from iterators import FairRndIterator
 
 
 class MediaPlayer:
@@ -11,8 +10,7 @@ class MediaPlayer:
     def __init__(self, initial_playlist: list):
         self._start = time.time()
         self._media_lock = threading.Lock()
-        #self._iter = iter(LoopMediaPipe.from_playlist(initial_playlist))
-        self._iter = iter(FairRndMediaPipe.from_playlist(initial_playlist))
+        self._iter = iter(FairRndIterator.from_list(initial_playlist))
         self._root = tkinter.Tk()
         self._root.title("Media Player Daemon")
 
@@ -31,12 +29,9 @@ class MediaPlayer:
     def settings(self):
         pass
 
-    def playlist_append(self, val):
-        pass
-
-    def playlist_replace(self, new_playlist: Playlist):
+    def playlist_replace(self, new_playlist: list):
         with self._media_lock:
-            self._iter = LoopMediaPipe.from_playlist(new_playlist)
+            self._iter = FairRndIterator.from_list(new_playlist)
 
     def run_forever(self):
         self._root.after(0, self._main_task)
