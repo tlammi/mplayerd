@@ -8,6 +8,9 @@ class Config:
     def __init__(self, file: str):
         self._data = JsonDict(file, False)
 
+    def media_set(self, name: str):
+        return self.media_sets()[name]
+
     def media_sets(self):
         root = self._data["media-config"]["media-root"]
         set_config = self._data["media-config"]["media-sets"]
@@ -15,6 +18,9 @@ class Config:
         for k, v in set_config.items():
             v["glob"] = os.path.join(root, v["glob"])
         return set_config
+
+    def playlist_config(self, playlist_name: str):
+        return self._data["playlists"][playlist_name]
 
     def schedule(self):
         def config_to_sched_item(year, month, day, time, event_meta):

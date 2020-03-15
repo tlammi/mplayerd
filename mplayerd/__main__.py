@@ -1,14 +1,40 @@
 from media import MediaPlayer, Media
 from scheduler import Scheduler
+import iterators
 import time
+import sys
 import threading
 import glob
 from datetime import datetime, timedelta
 import config
 import filters
 
-conf = config.Config("mplayerd\\config.json")
 
+def build_media_iterator(conf: config.Config):
+    iter_mapping = {
+        "Mux": iterators.MuxIterator,
+        "FairRnd": iterators.FairRndIterator,
+        "Loop": iterators.LoopIterator
+    }
+    algorithm = conf.playlist_config("mainokset")["algorithm"]
+    itertype = iter_mapping[algorithm]
+    media_set_name = conf.playlist_config("mainokset")["media-sets"][0]
+    media_set = conf.media_set(media_set_name)
+
+    files = glob.glob(media_set["glob"], recursive=True)
+    return itertype.from_list(files)
+
+
+
+def main():
+    conf = config.Config("mplayerd\\config.json")
+    schedule = conf.schedule()
+    print(schedule)
+    iterator = build_media_iterator(conf)
+    print(iterator)
+    sys.exit(0)
+
+main()
 bands = glob.glob(conf.media_sets()["bandit"]["glob"], recursive=True)
 print(f"before filter: {bands}")
 START = datetime(2019, 6, 20, 17, 0)
