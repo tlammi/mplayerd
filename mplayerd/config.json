@@ -1,0 +1,26 @@
+{
+  "media-config": {
+    "media-root": "G:\\googledrive\\Skriinille",
+    "media-sets": {
+      "mainokset": {
+        "glob": "Mainokset\\*.jpg"
+      }
+    }
+  },
+  "schedule": {
+    "2020":{
+      "06": {
+        "17": {
+          "14:45": {
+              "type": "switch-playlist",
+              "args": []
+          },
+          "16:00": {
+              "type": "switch-playlist",
+              "args": []
+          }
+        }
+      }
+    }
+  }
+}
