@@ -4,8 +4,22 @@ import time
 import threading
 import glob
 from datetime import datetime, timedelta
+import config
+import filters
 
+conf = config.Config("mplayerd\\config.json")
 
+bands = glob.glob(conf.media_sets()["bandit"]["glob"], recursive=True)
+print(f"before filter: {bands}")
+START = datetime(2019, 6, 20, 17, 0)
+END = START + timedelta(hours=5)
+bands = filters.date_filter(bands, START, END)
+print(f"after filter: {bands}")
+
+FILES = [Media(band, {"image-duration": "15.0"}) for band in bands]
+
+MediaPlayer(FILES).run_forever()
+"""
 def f(d, arg):
     print(f"d: {d}, arg: {arg}")
 
@@ -22,7 +36,7 @@ schedule = {
 s = Scheduler(f, schedule)
 
 s.start()
-
+"""
 
 
 """
