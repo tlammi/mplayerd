@@ -1,41 +1,38 @@
 from media import MediaPlayer, Media
+from scheduler import Scheduler
 import time
 import threading
 import glob
+from datetime import datetime, timedelta
 
-FILES = glob.glob(r"G:\googledrive\**", recursive=True)
+
+def f(d, arg):
+    print(f"d: {d}, arg: {arg}")
+
+
+EVENT_START_DATE = datetime(2020, 6, 17)
+
+schedule = {
+    datetime.now() - timedelta(hours=3): "0",
+    datetime.now() - timedelta(seconds=1): "asdf",
+    datetime.now() + timedelta(seconds=10): "10sec",
+    datetime.now() + timedelta(seconds=20): "20sec"
+}
+
+s = Scheduler(f, schedule)
+
+s.start()
+
+
+
+"""
+FILES = glob.glob(r"G:\googledrive\Skriinille\**", recursive=True)
 
 FILES = [f for f in FILES if f.endswith(".jpg")]
 FILES = [Media(f, {"image-duration": "2.0"}) for f in FILES]
-print(FILES)
+print("\n".join([f.file for f in FILES]))
 
-#FILES = [
-#    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2433.JPG", {"image-duration": "2.0"}),
-#    Media(r"C:\Users\Toni\Dropbox\Kuvat\JA7_2435.JPG", {"image-duration": "3.0"}),
-#    Media(r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4")
-#]
-
-FILES2 = [
-    r"C:\Users\Toni\Dropbox\Puntti\nostot\ranking_1_2018_temppu_83.MP4"
-]
-
-#plist = Playlist(FILES)
 player = MediaPlayer(FILES)
 
-"""
-def thread(p: MediaPlayer):
-    i = 0
-    while True:
-        if i % 2 == 0:
-            p.playlist_replace(Playlist(FILES))
-        else:
-            p.playlist_replace(Playlist(FILES2))
-
-        i += 1
-        time.sleep(3)
-
-
-t = threading.Thread(target=thread, args=(player,), daemon=True)
-t.start()
-"""
 player.run_forever()
+"""
