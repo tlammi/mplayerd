@@ -17,13 +17,25 @@ from scheduler import Scheduler
 
 LOGGER = logging.getLogger()
 
+def playlist_config_to_media_list(plist_config: config.PlaylistFile):
+    media = []
+    tmp = list(plist_config.media())
+    tmp.sort()
+    for m in tmp:
+        try:
+            media.append(Media(m, plist_config.options))
+        except FileNotFoundError:
+            # File removed between globbing and creation
+            pass
+    return media
+
 def sched_event_handler(date: datetime, value: str, cookie: tuple):
     LOGGER.debug("Scheduling event fired")
     mplayer, playlist_files = cookie
     plist_file = playlist_files[value]
-    plist = [Media(m, plist_file.options) for m in plist_file.media()]
+    media = playlist_config_to_media_list(plist_file)
     mplayer.playlist().clear()
-    mplayer.playlist().extend(plist)
+    mplayer.playlist().extend(media)
     LOGGER.debug("Scheduling event handled")
 
 def event_loop(mplayer: MediaPlayer):
@@ -34,9 +46,9 @@ def event_loop(mplayer: MediaPlayer):
         sched_event_handler,
         (mplayer, playlists)
     )
-    plist = playlists[s.current_value()]
-    medias = [Media(m, plist.options) for m in plist.media()]
-    mplayer.playlist().extend(medias)
+
+    media = playlist_config_to_media_list(playlists[s.current_value()])
+    mplayer.playlist().extend(media)
     mplayer.play()
 
 def main():
