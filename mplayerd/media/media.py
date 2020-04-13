@@ -13,13 +13,18 @@ class Media:
         self._orig_file = file
         suffix = self._orig_file.split(".")[-1]
         self._fhandle, self._file = tempfile.mkstemp(suffix=suffix)
-        with open(self._file, "w+b") as wf:
-            with open(self._orig_file, "r+b") as rf:
-                wf.write(rf.read())
+        try:
+            with open(self._file, "w+b") as wf:
+                with open(self._orig_file, "r+b") as rf:
+                    wf.write(rf.read())
 
-        self._options = []
-        for option, value in options.items():
-            self._options.append(f"{option}={value}")
+            self._options = []
+            for option, value in options.items():
+                self._options.append(f"{option}={value}")
+        except Exception:
+            os.close(self._fhandle)
+            os.remove(self._file)
+            raise
 
     def __del__(self):
         os.close(self._fhandle)
