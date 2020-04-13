@@ -1,5 +1,4 @@
 
-
 class Media:
 
     def __init__(self, file: str, options: dict = None):

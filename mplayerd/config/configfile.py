@@ -35,8 +35,8 @@ class ScheduleFile(ConfigFile):
         if events_after:
             out = dict(
                 filter(
-                    lambda key: key > events_after,
-                    data.keys()
+                    lambda item: item[0] > events_after,
+                    data.items()
                 )
             )
         else:

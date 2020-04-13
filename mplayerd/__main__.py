@@ -27,10 +27,10 @@ def sched_event_handler(date: datetime, value: str, cookie: tuple):
     LOGGER.debug("Scheduling event handled")
 
 def event_loop(mplayer: MediaPlayer):
-    sched, playlists = config.load_configs(r"G:\googledrive\Skriinille")
+    sched_conf, playlists = config.load_configs(r"G:\googledrive\Skriinille")
     s = Scheduler(
-        sched.default,
-        sched.schedule(),
+        sched_conf.default,
+        sched_conf.schedule(),
         sched_event_handler,
         (mplayer, playlists)
     )
@@ -38,7 +38,6 @@ def event_loop(mplayer: MediaPlayer):
     medias = [Media(m, plist.options) for m in plist.media()]
     mplayer.playlist().extend(medias)
     mplayer.play()
-    time.sleep(100000)
 
 def main():
     logging.basicConfig()

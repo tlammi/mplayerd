@@ -26,14 +26,15 @@ class Scheduler:
         next_event = datetime.datetime.max
         for date, val in schedule.items():
             self._sched.append((date, val))
-            LOGGER.debug("Scheduling event at %s", date)
-            sleep_dur = (date - start).total_seconds()
-            next_event = min(next_event, date)
-            self._timers.append(threading.Timer(
-                sleep_dur, self._ehandler, args=(date, val, self._cookie)
-            ))
-            self._timers[-1].daemon = True
-            self._timers[-1].start()
+            if date > start:
+                LOGGER.debug("Scheduling event at %s", date)
+                sleep_dur = (date - start).total_seconds()
+                next_event = min(next_event, date)
+                self._timers.append(threading.Timer(
+                    sleep_dur, self._ehandler, args=(date, val, self._cookie)
+                ))
+                self._timers[-1].daemon = True
+                self._timers[-1].start()
         LOGGER.info("Schedule updated")
         if next_event < datetime.datetime.max:
             LOGGER.info("Next event at %s", next_event)
