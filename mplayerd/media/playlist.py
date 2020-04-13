@@ -107,6 +107,18 @@ class Playlist:
                     self._list.extend(other._list)
         else:
             raise TypeError()
+    
+    def replace(self, other):
+        if isinstance(other, list):
+            with self._mut:
+                self._list.clear()
+                self._list.extend(other)
+        elif isinstance(other, Playlist):
+            with self._mut:
+                self._list.clear()
+                self._list.extend(other._list)
+        else:
+            raise TypeError()
 
     def iter(self):
         return Iterator(self._list, self._mut)
