@@ -11,13 +11,15 @@ from .. import media
 
 class Playlist(media.Src):
 
-    def __init__(self, playlist: Union[Uri, dict], directory: str = None):
+    def __init__(self, playlist: Union[Uri, dict], directory: str = None, default_config: dict = None):
         """
         Init
 
         :param playlist:
         :param directory: Path to containing directory. Used for relative globs
+        :param default_config: Configuration options to use in case no internal config is specified
         """
+        default_config = default_config or {}
         if isinstance(playlist, Uri):
             if playlist.scheme == "glob":
                 self._init_glob(playlist.resource, directory)
@@ -29,6 +31,8 @@ class Playlist(media.Src):
         else:
             self._init_obj(playlist)
         self._iter = iter(self.media)
+        if "loop" in default_config:
+            self._loop = default_config["loop"]
 
     def __copy__(self):
         cls = self.__class__
@@ -45,7 +49,12 @@ class Playlist(media.Src):
         return result
 
     def next(self) -> str:
-        return next(self._iter)
+        try:
+            return next(self._iter)
+        except StopIteration:
+            if self._loop:
+                self._iter = iter(self.media)
+                return next(self._iter)
 
     def _init_glob(self, glob_str: str, directory: str = None):
         kwargs = {

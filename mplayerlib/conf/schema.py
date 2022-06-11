@@ -7,6 +7,12 @@ DEFINITIONS = {
     "TimePoint": {
 
     },
+    "PlaylistConfig": {
+        "type": "object",
+        "properties": {
+            "loop": {"type": "boolean"}
+        }
+    },
     "SchedEntry": {
         "type": "array",
         "prefixItems": [
@@ -46,7 +52,10 @@ CONF = {
             "const": 0,
         },
         "config": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "playlist-default": {"$ref": "#/$defs/PlaylistConfig"}
+            }
         },
         "playlists": PLAYLIST,
         "schedule": SCHEDULE,

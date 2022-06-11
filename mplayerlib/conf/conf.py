@@ -27,10 +27,16 @@ class Conf:
         self.playlists = []
         self.schedule = None
 
+        c = d["config"]
+        if "playlist-default" in c:
+            playlist_config = c["playlist-default"]
+        else:
+            playlist_config = {}
+
         for k, v in d["playlists"].items():
             if isinstance(v, str):
                 v = Uri.parse(v, directory)
-            self.playlists.append(Playlist(v, directory))
+            self.playlists.append(Playlist(v, directory, playlist_config))
 
         if "schedule" in d:
             v = d["schedule"]
