@@ -31,7 +31,7 @@ class Conf:
         for k, v in d["playlists"].items():
             if isinstance(v, str):
                 v = Uri.parse(v, directory)
-            self.playlists.append(Playlist(v))
+            self.playlists.append(Playlist(v, directory))
 
         if "schedule" in d:
             v = d["schedule"]
