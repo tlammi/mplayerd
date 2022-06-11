@@ -5,9 +5,15 @@ from typing import Union
 from . import schema
 from .uri import Uri
 from .playlist import Playlist
+from .schedule import Schedule
 
 
 class Conf:
+    """
+    Root configuration object
+
+    """
+
     def __init__(self, d: dict, directory: str = None):
         """
         Create a new configuration object
@@ -18,40 +24,15 @@ class Conf:
         """
         jsonschema.validate(d, schema=schema.CONF)
         self.playlists = []
+        self.schedule = None
 
         for k, v in d["playlists"].items():
+            if isinstance(v, str):
+                v = Uri.parse(v, directory)
             self.playlists.append(Playlist(v))
 
-        #try:
-        #    Conf._resolve_incs(self._d["schedule"], directory)
-        #except KeyError:
-        #    pass
-
-    @classmethod
-    def _resolve_incs(cls, obj: Union[dict, list], directory: str):
-        if isinstance(obj, dict):
-            cls._resolve_incs_dict(obj, directory)
-        else:
-            cls._resolve_incs_list(obj, directory)
-
-    @classmethod
-    def _resolve_incs_dict(cls, d: dict, directory: str):
-        for k, v in d.items():
-            try:
-                u = Uri.parse(v, directory)
-                if u.scheme == "inc":
-                    with open(u.resource, "r") as f:
-                        d[k] = json.load(f)
-            except ValueError:
-                pass
-
-    @classmethod
-    def _resolve_incs_list(cls, a: list, directory: str):
-        for i, v in enumerate(a):
-            try:
-                u = Uri.parse(v, directory)
-                if u.scheme == "inc":
-                    with open(u.resource, "r") as f:
-                        a[i] = json.load(f)
-            except ValueError:
-                pass
+        if "schedule" in d:
+            v = d["schedule"]
+            if isinstance(v, str):
+                v = Uri.parse(v, directory)
+            self.schedule = Schedule(v)
