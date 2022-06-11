@@ -1,4 +1,4 @@
-
+import copy
 import json
 import jsonschema
 import glob
@@ -12,6 +12,12 @@ from .. import media
 class Playlist(media.Src):
 
     def __init__(self, playlist: Union[Uri, dict], directory: str = None):
+        """
+        Init
+
+        :param playlist:
+        :param directory: Path to containing directory. Used for relative globs
+        """
         if isinstance(playlist, Uri):
             if playlist.scheme == "glob":
                 self._init_glob(playlist.resource, directory)
@@ -23,6 +29,20 @@ class Playlist(media.Src):
         else:
             self._init_obj(playlist)
         self._iter = iter(self.media)
+
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+    def __deepcopy__(self, memodict={}):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memodict[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, copy.deepcopy(v, memodict))
+        return result
 
     def next(self) -> str:
         return next(self._iter)
