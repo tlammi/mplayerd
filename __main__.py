@@ -23,9 +23,13 @@ def main():
     args = parse_cli()
     conf = mplayerlib.conf.Conf.load(args.source)
     frontends = [mplayerlib.media.player(f) for f in args.frontend]
-    frontends[0].set_media_source(copy.deepcopy(conf.playlists[0]))
-    frontends[0].play()
-    time.sleep(30)
+    for f in frontends:
+        f.set_media_source(copy.deepcopy((conf.playlists[0])))
+    for f in frontends:
+        f.play()
+    time.sleep(10)
+    for f in frontends:
+        f.stop()
 
 
 if __name__ == "__main__":
