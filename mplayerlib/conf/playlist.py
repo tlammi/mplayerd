@@ -6,9 +6,10 @@ import glob
 from typing import Union
 from .uri import Uri
 from . import schema
+from .. import media
 
 
-class Playlist:
+class Playlist(media.Src):
 
     def __init__(self, playlist: Union[Uri, dict], directory: str = None):
         if isinstance(playlist, Uri):
@@ -21,6 +22,10 @@ class Playlist:
                 raise ValueError(f"Unsupported scheme: {playlist.scheme}")
         else:
             self._init_obj(playlist)
+        self._iter = iter(self.media)
+
+    def next(self) -> str:
+        return next(self._iter)
 
     def _init_glob(self, glob_str: str, directory: str = None):
         kwargs = {

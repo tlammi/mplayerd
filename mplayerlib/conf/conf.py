@@ -3,7 +3,6 @@ import json
 import os.path
 
 import jsonschema
-from typing import Union
 from . import schema
 from .uri import Uri
 from .playlist import Playlist
