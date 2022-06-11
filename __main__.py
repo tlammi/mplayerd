@@ -2,6 +2,8 @@ import sys
 import argparse
 import copy
 import time
+import typing
+import tkinter
 
 import mplayerlib
 
@@ -22,12 +24,14 @@ def parse_cli():
 def main():
     args = parse_cli()
     conf = mplayerlib.conf.Conf.load(args.source)
-    frontends = [mplayerlib.media.player(f) for f in args.frontend]
+    root = tkinter.Tk()
+    frontends = [mplayerlib.media.player(f, root) for f in args.frontend]
+
     for f in frontends:
         f.set_media_source(copy.deepcopy((conf.playlists[0])))
     for f in frontends:
         f.play()
-    time.sleep(10)
+    root.mainloop()
     for f in frontends:
         f.stop()
 

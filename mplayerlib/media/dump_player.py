@@ -1,6 +1,7 @@
 
 import threading
 import time
+import tkinter
 
 from .player import Player
 from .src import Src
@@ -10,7 +11,7 @@ class DumpPlayer(Player):
     """
     Player frontend which only dumps the media name/path to terminal
     """
-    def __init__(self):
+    def __init__(self, _: tkinter.Tk):
         self._src = None
         self._thread = threading.Thread(target=self._work)
         self._mut = threading.Lock()
