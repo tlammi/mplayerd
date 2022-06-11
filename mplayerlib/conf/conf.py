@@ -1,5 +1,7 @@
 
 import json
+import os.path
+
 import jsonschema
 from typing import Union
 from . import schema
@@ -36,3 +38,15 @@ class Conf:
             if isinstance(v, str):
                 v = Uri.parse(v, directory)
             self.schedule = Schedule(v)
+
+    @staticmethod
+    def load(path: str):
+        """
+        Load configuration from a file
+
+        :param path: Path to configuration file
+        :return: Config object constructed from the file
+        """
+        d = os.path.realpath(os.path.dirname(path))
+        with open(path, "r") as f:
+            return Conf(json.load(f), d)
