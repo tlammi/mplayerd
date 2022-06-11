@@ -8,7 +8,7 @@ def test_minimal():
     Conf({
         "version": 0,
         "config": {},
-        "playlists": []
+        "playlists": {}
     })
 
 
@@ -17,5 +17,5 @@ def test_wrong_version():
         Conf({
             "version": 69,
             "config": {},
-            "playlists": []
+            "playlists": {}
         })

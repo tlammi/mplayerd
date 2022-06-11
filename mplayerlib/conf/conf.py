@@ -4,6 +4,7 @@ import jsonschema
 from typing import Union
 from . import schema
 from .uri import Uri
+from .playlist import Playlist
 
 
 class Conf:
@@ -16,13 +17,15 @@ class Conf:
             Relative imports do not work without this
         """
         jsonschema.validate(d, schema=schema.CONF)
-        self._d = d
+        self.playlists = []
 
-        Conf._resolve_incs(self._d["playlists"], directory)
-        try:
-            Conf._resolve_incs(self._d["schedule"], directory)
-        except KeyError:
-            pass
+        for k, v in d["playlists"].items():
+            self.playlists.append(Playlist(v))
+
+        #try:
+        #    Conf._resolve_incs(self._d["schedule"], directory)
+        #except KeyError:
+        #    pass
 
     @classmethod
     def _resolve_incs(cls, obj: Union[dict, list], directory: str):

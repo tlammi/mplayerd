@@ -21,9 +21,9 @@ DEFINITIONS = {
 PLAYLIST = {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$defs": DEFINITIONS,
-    "type": "array",
-    "items": {
-        "$ref": "#/$defs/Uri",
+    "type": "object",
+    "patternProperties": {
+        "^.*$": {"$ref": "#/$defs/Uri"}
     }
 }
 
