@@ -73,10 +73,10 @@ class VlcPlayer(Player):
 
     def set_media_source(self, source: Src):
         with self._mut:
+            old = self._src
             self._src = source
-
-    def run_forever(self):
-        self._root.mainloop()
+            if source is not None and old is None:
+                self.play()
 
     def stop(self):
         pass
@@ -84,7 +84,14 @@ class VlcPlayer(Player):
     def _play_media(self):
         try:
             with self._mut:
-                media = self._src.next()
+                if self._src is None:
+                    # Cannot do anything if no medias available
+                    return
+                try:
+                    media = self._src.next()
+                except StopIteration:
+                    # No media available
+                    return
             vlc_media = self._inst.media_new(media)
             self._mplayer.set_media(vlc_media)
             if self._mplayer.play():
