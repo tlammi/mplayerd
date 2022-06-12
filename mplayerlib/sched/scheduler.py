@@ -63,6 +63,20 @@ class Scheduler:
         for value in [v for k, v in self._sched if k < t]:
             yield value
 
+    def last_expired(self, override_clock=None):
+        """
+        Get the event last expired
+
+        :param override_clock: Override work_clock from ctor
+        :return: matching event payload, or None if no event exists
+        """
+        t = (override_clock or self._clock)() - self._start
+        t = timedelta(seconds=t)
+        try:
+            return [v for v in self._sched if v[0] < t][-1][1]
+        except KeyError:
+            return None
+
     def next(self, override_clock=None):
         """
         Get next expiring event

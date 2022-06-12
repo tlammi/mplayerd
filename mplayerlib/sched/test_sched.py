@@ -30,6 +30,17 @@ def test_expired():
     assert(expired == [0, 2, 1, 3])
 
 
+def test_last_expired():
+    s = Scheduler(EVENTS)
+    value = s.last_expired()
+    assert(value == 2)
+
+    def future_clock():
+        return time.monotonic() + 60*60*2
+    value = s.last_expired(future_clock)
+    assert(value == 1)
+
+
 def test_next():
     s = Scheduler(EVENTS)
     _, value = s.next()

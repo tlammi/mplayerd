@@ -9,7 +9,7 @@ def test_minimal():
         "version": 0,
         "config": {},
         "playlists": {}
-    })
+    }, ".", "dummy")
 
 
 def test_wrong_version():
@@ -18,4 +18,4 @@ def test_wrong_version():
             "version": 69,
             "config": {},
             "playlists": {}
-        })
+        }, ".", "dummy")
