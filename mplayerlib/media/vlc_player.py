@@ -75,8 +75,8 @@ class VlcPlayer(Player):
         with self._mut:
             old = self._src
             self._src = source
-            if source is not None and old is None:
-                self.play()
+        if source is not None and old is None:
+            self.play()
 
     def stop(self):
         pass
