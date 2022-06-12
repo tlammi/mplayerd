@@ -2,6 +2,7 @@ import copy
 import json
 import jsonschema
 import glob
+import os
 
 from typing import Union
 from .uri import Uri
@@ -11,7 +12,7 @@ from .. import media
 
 class Playlist(media.Src):
 
-    def __init__(self, playlist: Union[Uri, dict], directory: str = None, default_config: dict = None):
+    def __init__(self, playlist: Union[Uri, dict], directory: str, default_config: dict = None):
         """
         Init
 
@@ -19,10 +20,11 @@ class Playlist(media.Src):
         :param directory: Path to containing directory. Used for relative globs
         :param default_config: Configuration options to use in case no internal config is specified
         """
+        self._dir = directory
         default_config = default_config or {}
         if isinstance(playlist, Uri):
             if playlist.scheme == "glob":
-                self._init_glob(playlist.resource, directory)
+                self._init_glob(playlist.resource)
             elif playlist.scheme == "inc":
                 with open(playlist.resource) as f:
                     self._init_obj(json.load(f))
@@ -48,6 +50,11 @@ class Playlist(media.Src):
             setattr(result, k, copy.deepcopy(v, memodict))
         return result
 
+    def dump(self) -> list:
+        """
+        """
+        return [os.path.relpath(m, self._dir) for m in self.media]
+
     def next(self) -> str:
         try:
             return next(self._iter)
@@ -56,13 +63,9 @@ class Playlist(media.Src):
                 self._iter = iter(self.media)
                 return next(self._iter)
 
-    def _init_glob(self, glob_str: str, directory: str = None):
-        kwargs = {
-            "recursive": True
-        }
-        if directory is not None:
-            kwargs["root_dir"] = directory
-        self.media = glob.glob(glob_str, **kwargs)
+    def _init_glob(self, glob_str: str):
+        self.media = glob.glob(glob_str, recursive=True, root_dir=self._dir)
 
     def _init_obj(self, playlist: dict):
+        # TODO: Implement
         jsonschema.validate(playlist, schema=schema.PLAYLIST)

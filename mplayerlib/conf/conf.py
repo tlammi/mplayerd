@@ -15,7 +15,7 @@ class Conf:
 
     """
 
-    def __init__(self, d: dict, directory: str = None):
+    def __init__(self, d: dict, directory: str, name: str):
         """
         Create a new configuration object
 
@@ -24,25 +24,37 @@ class Conf:
             Relative imports do not work without this
         """
         jsonschema.validate(d, schema=schema.CONF)
-        self.playlists = []
+        self.playlists = {}
         self.schedule = Schedule([])
+        # Directory containing config
+        self.parent = directory
+        # Config file name
+        self.name = name
 
-        c = d["config"]
-        if "playlist-default" in c:
-            playlist_config = c["playlist-default"]
+        self._c = d["config"]
+        if "playlist-default" in self._c:
+            playlist_config = self._c["playlist-default"]
         else:
             playlist_config = {}
 
         for k, v in d["playlists"].items():
             if isinstance(v, str):
                 v = Uri.parse(v, directory)
-            self.playlists.append(Playlist(v, directory, playlist_config))
+            self.playlists[k] = Playlist(v, directory, playlist_config)
 
         if "schedule" in d:
             v = d["schedule"]
             if isinstance(v, str):
                 v = Uri.parse(v, directory)
             self.schedule = Schedule(v)
+
+    def dump(self) -> dict:
+        out = {
+            "version": 0,
+            "config": self._c,
+            "playlists": {k: p.dump() for k, p in self.playlists.items()}
+        }
+        return out
 
     @staticmethod
     def load(path: str):
@@ -53,5 +65,6 @@ class Conf:
         :return: Config object constructed from the file
         """
         d = os.path.realpath(os.path.dirname(path))
+        n = os.path.basename(path)
         with open(path, "r") as f:
-            return Conf(json.load(f), d)
+            return Conf(json.load(f), d, n)
