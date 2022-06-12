@@ -34,3 +34,9 @@ class Schedule:
 
     def dump(self):
         return self._sched
+
+    def __eq__(self, other: 'Schedule'):
+        return self._sched == other._sched
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
