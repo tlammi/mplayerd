@@ -30,9 +30,7 @@ class Workspace:
         os.makedirs(work_path, exist_ok=True)
         self._work_path = work_path
         self._a = os.path.join(self._work_path, "a")
-        os.makedirs(self._a, exist_ok=True)
         self._b = os.path.join(self._work_path, "b")
-        os.makedirs(self._b, exist_ok=True)
         self._active = self._b
 
     def load(self, conf: Union[Conf, str]):
@@ -45,6 +43,8 @@ class Workspace:
         if isinstance(conf, str):
             conf = Conf.load(conf)
         slot = self._next()
+        shutil.rmtree(slot, ignore_errors=True)
+        os.makedirs(slot, exist_ok=True)
         with open(os.path.join(slot, "mplayer.conf"), "w") as f:
             json.dump(conf.dump(), f, indent=4)
         for p in conf.playlists.values():
