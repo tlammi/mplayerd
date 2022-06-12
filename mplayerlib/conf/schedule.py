@@ -31,3 +31,6 @@ class Schedule:
 
     def __next__(self):
         raise StopIteration()
+
+    def dump(self):
+        return self._sched

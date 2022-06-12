@@ -52,7 +52,8 @@ class Conf:
         out = {
             "version": 0,
             "config": self._c,
-            "playlists": {k: p.dump() for k, p in self.playlists.items()}
+            "playlists": {k: p.dump() for k, p in self.playlists.items()},
+            "schedule": self.schedule.dump()
         }
         return out
 
