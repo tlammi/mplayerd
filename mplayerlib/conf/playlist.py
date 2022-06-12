@@ -20,7 +20,7 @@ class Playlist(media.Src):
         :param directory: Path to containing directory. Used for relative globs
         :param default_config: Configuration options to use in case no internal config is specified
         """
-        self._dir = directory
+        self.directory = directory
         default_config = default_config or {}
         if isinstance(playlist, Uri):
             if playlist.scheme == "glob":
@@ -53,7 +53,7 @@ class Playlist(media.Src):
     def dump(self) -> list:
         """
         """
-        return [os.path.relpath(m, self._dir) for m in self.media]
+        return [os.path.relpath(m, self.directory) for m in self.media]
 
     def next(self) -> str:
         try:
@@ -64,7 +64,7 @@ class Playlist(media.Src):
                 return next(self._iter)
 
     def _init_glob(self, glob_str: str):
-        self.media = glob.glob(glob_str, recursive=True, root_dir=self._dir)
+        self.media = glob.glob(glob_str, recursive=True, root_dir=self.directory)
 
     def _init_obj(self, playlist: dict):
         # TODO: Implement

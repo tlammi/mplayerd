@@ -1,0 +1,58 @@
+import json
+import os
+import shutil
+from typing import Union
+
+from .conf import Conf
+
+
+class Workspace:
+    """
+    Copy of source files to allow safe handling of deleted files
+
+    This object is used to keep duplicate data of source files somewhere
+    else in the file system. Due to this it is safe to delete various.
+    files from the source directory without affecting the process.
+
+    Workspace consists of two slots, A and B which are written in turns
+    allowing a fallback in case something goes wrong when copying a source directory.
+    This might be the case e.g. if an invalid configuration is placed in the
+    source directory.
+
+    Only configuration and media files (etc.) are copied.
+    """
+
+    def __init__(self, work_path: str, conf: Union[Conf, str]):
+        """
+        :param work_path: Path to workspace. Directory path is populated recursively if it does not exist
+        :param conf: Config loaded from the source directory
+        """
+        os.makedirs(work_path, exist_ok=True)
+        self._work_path = work_path
+        self._a = os.path.join(self._work_path, "a")
+        os.makedirs(self._a, exist_ok=True)
+        self._b = os.path.join(self._work_path, "b")
+        os.makedirs(self._b, exist_ok=True)
+        self._active = self._b
+        self.load(conf)
+
+    def load(self, conf: Union[Conf, str]):
+        if isinstance(conf, str):
+            conf = Conf.load(conf)
+        slot = self._next()
+        with open(os.path.join(slot, "mplayer.conf"), "w") as f:
+            json.dump(conf.dump(), f, indent=4)
+        for p in conf.playlists.values():
+            for src_abs in p.media:
+                src_rel = os.path.relpath(src_abs, p.directory)
+                dst_abs = os.path.join(slot, src_rel)
+                print(f"Copying to {dst_abs}")
+                os.makedirs(os.path.dirname(dst_abs), exist_ok=True)
+                shutil.copy(src_abs, dst_abs, follow_symlinks=True)
+        self._active = slot
+
+    def _next(self):
+        if self._active == self._a:
+            return self._b
+        else:
+            return self._a
