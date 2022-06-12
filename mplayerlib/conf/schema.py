@@ -1,11 +1,16 @@
 
+SCHEMA_URL = "https://json-schema.org/draft/2020-12/schema"
+
 DEFINITIONS = {
     "Uri": {
         "type": "string",
         "format": "uri"
     },
     "TimePoint": {
-
+        "oneOf": [
+            {"type": "integer"},
+            {"type": "string"}
+        ]
     },
     "PlaylistConfig": {
         "type": "object",
@@ -17,7 +22,7 @@ DEFINITIONS = {
         "type": "array",
         "prefixItems": [
             {"$ref": "#/$defs/TimePoint"},
-            {}  # any object
+            {"type": "string"}
         ],
         "items": False
     }
@@ -25,7 +30,7 @@ DEFINITIONS = {
 
 
 PLAYLIST = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": SCHEMA_URL,
     "$defs": DEFINITIONS,
     "type": "object",
     "patternProperties": {
@@ -34,7 +39,7 @@ PLAYLIST = {
 }
 
 SCHEDULE = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": SCHEMA_URL,
     "$defs": DEFINITIONS,
     "type": "array",
     "items": {
@@ -43,7 +48,7 @@ SCHEDULE = {
 }
 
 CONF = {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": SCHEMA_URL,
     "type": "object",
     "$defs": DEFINITIONS,
     "properties": {
