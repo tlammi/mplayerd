@@ -3,7 +3,7 @@ import re
 from typing import Union
 from datetime import datetime, timedelta
 
-EventPoint = Union[datetime, timedelta, str]
+EventPoint = Union[datetime, timedelta, str, int]
 
 _TIME_FORMAT = "%Y-%m-%d %H:%M"
 _DATE_REGEX = re.compile(r"(\d+)(h|m|s)")
@@ -23,6 +23,8 @@ def parse_event_time(e: EventPoint) -> Union[datetime, timedelta]:
             return datetime.strptime(e, _TIME_FORMAT)
         except ValueError:
             pass
+    if isinstance(e, int):
+        return datetime.fromtimestamp(e)
     match = _DATE_REGEX.findall(e)
     if not match:
         raise ValueError(f"Invalid string: {e}")

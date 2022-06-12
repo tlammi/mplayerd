@@ -27,6 +27,8 @@ def main():
     root = tkinter.Tk()
     frontends = [mplayerlib.media.player(f, root) for f in args.frontend]
 
+    _sched = mplayerlib.sched.Scheduler(conf.schedule)
+
     for f in frontends:
         f.set_media_source(copy.deepcopy((conf.playlists[0])))
     for f in frontends:

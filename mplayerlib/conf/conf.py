@@ -25,7 +25,7 @@ class Conf:
         """
         jsonschema.validate(d, schema=schema.CONF)
         self.playlists = []
-        self.schedule = None
+        self.schedule = Schedule([])
 
         c = d["config"]
         if "playlist-default" in c:
