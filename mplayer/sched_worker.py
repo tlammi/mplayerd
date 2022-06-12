@@ -14,6 +14,12 @@ class SchedWorker:
         self._sched = mplayerlib.sched.Scheduler(conf.schedule)
         self._fronts = frontends
         self._cv = threading.Condition()
+        self._operate = True
+
+        previous = self._sched.last_expired()
+        for f in self._fronts:
+            f.set_media_source(self._conf.playlists[previous])
+
         self._t = threading.Thread(target=self._work)
         self._t.start()
 
@@ -21,14 +27,21 @@ class SchedWorker:
         """
         Set the worker schedule to a new configuration
         """
-        self._conf = conf
-        self._sched = mplayerlib.sched.Scheduler(conf.schedule)
+        print("Updating configuration")
+        with self._cv:
+            self._conf = conf
+            self._sched = mplayerlib.sched.Scheduler(conf.schedule)
+            previous = self._sched.last_expired()
+            for f in self._fronts:
+                f.set_media_source(self._conf.playlists[previous])
+            self._cv.notify()
 
     def terminate(self):
         """
         Signal to terminate the worker
         """
         with self._cv:
+            self._operate = False
             self._cv.notify()
         try:
             self._t.join()
@@ -36,19 +49,16 @@ class SchedWorker:
             pass
 
     def _work(self):
-        print(f"Already gone events {[i for i in self._sched.already_expired()]}")
-        previous = self._sched.last_expired()
-        print("setting playlist")
-        for f in self._fronts:
-            print(f"setting {f}")
-            f.set_media_source(self._conf.playlists[previous])
-        print("playlist set")
-        while True:
-            dur, playlist = self._sched.next()
-            with self._cv:
+        with self._cv:
+            while True:
+                sched = self._sched
+                conf = self._conf
+                dur, playlist = sched.next()
                 notified = self._cv.wait(dur)
                 if notified:
-                    break
+                    if not self._operate:
+                        break
+                    continue
                 else:
                     for f in self._fronts:
-                        f.set_media_source(self._conf.playlists[playlist])
+                        f.set_media_source(conf.playlists[playlist])

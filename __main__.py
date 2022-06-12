@@ -14,7 +14,7 @@ def parse_cli():
                    help=f"Frontend(s) to use: {players}. Default: ['dump']", action="append")
     p.add_argument("-w", "--workspace",
                    help=f"Set workspace path. Default {default_workspace}", default=default_workspace)
-    p.add_argument("-r", "--reload", help="Config reload interval in seconds. Default: 120", default=120)
+    p.add_argument("-r", "--reload", help="Config reload interval in seconds. Default: 120", type=int, default=120)
     p.add_argument("source",
                    help="Path to configuration where to start.")
     ns = p.parse_args(sys.argv[1:])

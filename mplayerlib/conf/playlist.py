@@ -1,4 +1,5 @@
 import copy
+import filecmp
 import json
 import jsonschema
 import glob
@@ -72,3 +73,30 @@ class Playlist(media.Src):
     def _init_obj(self, playlist: dict):
         # TODO: Implement
         jsonschema.validate(playlist, schema=schema.PLAYLIST)
+
+    def __eq__(self, other: 'Playlist'):
+        """
+        Compare if two playlists are equal
+
+        Returns True if the playlists contain the same relative paths
+        and files referenced by the paths are equal.
+        """
+        print("comparing playlist")
+        if self._loop != other._loop:
+            return False
+        my = [os.path.relpath(p, self.directory) for p in self.media]
+        my.sort()
+        others = [os.path.relpath(p, other.directory) for p in other.media]
+        others.sort()
+        if my != others:
+            print(f"my:{my}, others:{others}")
+            return False
+        for m, o in zip(self.media, other.media):
+            if not filecmp.cmp(m, o):
+                print(f"files: {m} and {o} were different")
+                return False
+        print("playlist equal")
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

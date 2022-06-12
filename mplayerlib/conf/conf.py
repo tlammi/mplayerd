@@ -69,3 +69,15 @@ class Conf:
         n = os.path.basename(path)
         with open(path, "r") as f:
             return Conf(json.load(f), d, n)
+
+    def __eq__(self, other: 'Conf'):
+        if self._c != other._c:
+            return False
+        if self.playlists != other.playlists:
+            return False
+        if self.schedule != other.schedule:
+            return False
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
