@@ -22,7 +22,7 @@ class Workspace:
     Only configuration and media files (etc.) are copied.
     """
 
-    def __init__(self, work_path: str, conf: Union[Conf, str]):
+    def __init__(self, work_path: str):
         """
         :param work_path: Path to workspace. Directory path is populated recursively if it does not exist
         :param conf: Config loaded from the source directory
@@ -34,9 +34,14 @@ class Workspace:
         self._b = os.path.join(self._work_path, "b")
         os.makedirs(self._b, exist_ok=True)
         self._active = self._b
-        self.load(conf)
 
     def load(self, conf: Union[Conf, str]):
+        """
+        Copy workspace from conf to workspace
+
+        :param conf:
+        :return:
+        """
         if isinstance(conf, str):
             conf = Conf.load(conf)
         slot = self._next()
@@ -46,10 +51,11 @@ class Workspace:
             for src_abs in p.media:
                 src_rel = os.path.relpath(src_abs, p.directory)
                 dst_abs = os.path.join(slot, src_rel)
-                print(f"Copying to {dst_abs}")
                 os.makedirs(os.path.dirname(dst_abs), exist_ok=True)
                 shutil.copy(src_abs, dst_abs, follow_symlinks=True)
         self._active = slot
+        path = os.path.join(slot, "mplayer.conf")
+        return Conf.load(path)
 
     def _next(self):
         if self._active == self._a:

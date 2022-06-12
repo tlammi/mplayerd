@@ -29,7 +29,9 @@ def main():
     args = parse_cli()
     conf = mplayerlib.conf.Conf.load(args.source)
     print(f"Parsed config: {json.dumps(conf.dump(), indent=4)}")
-    ws = mplayerlib.Workspace(args.workspace, conf)
+    ws = mplayerlib.Workspace(args.workspace)
+    conf = ws.load(conf)
+    print(f"Moved config: {json.dumps(conf.dump(), indent=4)}")
     root = tkinter.Tk()
     frontends = [mplayerlib.media.player(f, root) for f in args.frontend]
 

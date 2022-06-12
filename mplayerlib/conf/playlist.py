@@ -12,7 +12,7 @@ from .. import media
 
 class Playlist(media.Src):
 
-    def __init__(self, playlist: Union[Uri, dict], directory: str, default_config: dict = None):
+    def __init__(self, playlist: Union[Uri, dict, list], directory: str, default_config: dict = None):
         """
         Init
 
@@ -20,6 +20,7 @@ class Playlist(media.Src):
         :param directory: Path to containing directory. Used for relative globs
         :param default_config: Configuration options to use in case no internal config is specified
         """
+        self.media = []
         self.directory = directory
         default_config = default_config or {}
         if isinstance(playlist, Uri):
@@ -30,6 +31,8 @@ class Playlist(media.Src):
                     self._init_obj(json.load(f))
             else:
                 raise ValueError(f"Unsupported scheme: {playlist.scheme}")
+        elif isinstance(playlist, list):
+            self.media = [os.path.realpath(os.path.join(self.directory, i)) for i in playlist]
         else:
             self._init_obj(playlist)
         self._iter = iter(self.media)

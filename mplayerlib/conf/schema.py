@@ -18,6 +18,15 @@ DEFINITIONS = {
             "loop": {"type": "boolean"}
         }
     },
+    "PlaylistEntry": {
+        "oneOf": [
+            {"$ref": "#/$defs/Uri"},
+            {
+                "type": "array",
+                "items": {"type": "string"}
+            }
+        ]
+    },
     "SchedEntry": {
         "type": "array",
         "prefixItems": [
@@ -34,7 +43,7 @@ PLAYLIST = {
     "$defs": DEFINITIONS,
     "type": "object",
     "patternProperties": {
-        "^.*$": {"$ref": "#/$defs/Uri"}
+        "^.*$": {"$ref": "#/$defs/PlaylistEntry"}
     }
 }
 
