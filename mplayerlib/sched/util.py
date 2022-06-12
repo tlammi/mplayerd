@@ -29,5 +29,5 @@ def parse_event_time(e: EventPoint) -> Union[datetime, timedelta]:
     delta = timedelta()
     for m in match:
         dur, unit = m
-        delta += timedelta(seconds=dur*_UNIT_MULTIPIER[unit])
+        delta += timedelta(seconds=float(dur)*_UNIT_MULTIPIER[unit])
     return delta
