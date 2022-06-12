@@ -10,6 +10,7 @@ def test_ctor():
     Scheduler([(datetime.fromtimestamp(0), None)])
     Scheduler([(timedelta(), None)])
 
+
 EVENTS = [
     ("1970-02-02 12:00", 0),
     ("1h", 1),
