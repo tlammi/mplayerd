@@ -1,5 +1,6 @@
 import sys
 import argparse
+import os
 import copy
 import json
 import threading
@@ -20,6 +21,11 @@ class Shared:
         self._mut = threading.Lock()
         self._conf = conf
         self._fronts = frontends
+        self._cv = threading.Condition()
+
+    @property
+    def condition(self):
+        return self._cv
 
     @property
     def frontends(self):
@@ -44,6 +50,7 @@ def parse_cli():
                    help=f"Frontend(s) to use: {players}. Default: ['dump']", action="append")
     p.add_argument("-w", "--workspace",
                    help=f"Set workspace path. Default {default_workspace}", default=default_workspace)
+    p.add_argument("-r", "--reload", help="Config reload interval in seconds. Default: 120", default=120)
     p.add_argument("source",
                    help="Path to configuration where to start.")
     ns = p.parse_args(sys.argv[1:])
@@ -62,7 +69,30 @@ def sched_worker(state: Shared):
     for f in state.frontends:
         print("setting playlist")
         f.set_media_source(state.conf.playlists[previous])
-    time.sleep(30)
+    while True:
+        dur, playlist = sched.next()
+        with state.condition:
+            notified = state.condition.wait(dur)
+            if notified:
+                break
+            else:
+                for f in state.frontends:
+                    f.set_media_source(state.conf.playlists[playlist])
+
+
+def reload_worker(interval: int, workspace: mplayerlib.Workspace, state: Shared):
+    print(f"Starting reload worker with interval '{interval}'")
+    while True:
+        with state.condition:
+            notified = state.condition.wait(interval)
+            if notified:
+                break
+            else:
+                print("Reloading configuration")
+                path = os.path.join(state.conf.parent, state.conf.name)
+                conf = workspace.load(path)
+                print("Updating configuration")
+                state.conf = conf
 
 
 def main():
@@ -77,12 +107,21 @@ def main():
     state = Shared(conf, frontends)
     sched_worker_thread = threading.Thread(target=sched_worker, args=[state])
     sched_worker_thread.start()
+    reload_worker_thread = threading.Thread(target=reload_worker, args=[args.reload, ws, state])
+    reload_worker_thread.start()
 
     for f in frontends:
         f.play()
-    root.mainloop()
+    try:
+        root.mainloop()
+    except KeyboardInterrupt:
+        pass
     for f in frontends:
         f.stop()
+    with state.condition:
+        state.condition.notify_all()
+    sched_worker_thread.join()
+    reload_worker_thread.join()
 
 
 if __name__ == "__main__":
