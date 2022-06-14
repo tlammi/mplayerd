@@ -52,7 +52,7 @@ class Workspace:
                 src_rel = os.path.relpath(src_abs, p.directory)
                 dst_abs = os.path.join(slot, src_rel)
                 os.makedirs(os.path.dirname(dst_abs), exist_ok=True)
-                shutil.copy(src_abs, dst_abs, follow_symlinks=True)
+                shutil.copy2(src_abs, dst_abs, follow_symlinks=True)
         self._active = slot
         path = os.path.join(slot, "mplayer.conf")
         return Conf.load(path)
