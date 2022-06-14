@@ -1,9 +1,14 @@
+import logging
 import sys
 import argparse
 import tkinter
+import os
 
 import mplayerlib
 import mplayer
+
+
+LOGGER = logging.getLogger("")
 
 
 def parse_cli():
@@ -25,13 +30,17 @@ def parse_cli():
 
 def main():
     args = parse_cli()
+    mplayerlib.log.init(os.path.dirname(args.source))
+    LOGGER.info("Initializing mplayerd library")
     root = tkinter.Tk()
     settings = mplayer.Settings(root, args.source, args.workspace, args.frontend, args.reload)
-
+    LOGGER.info("Library created. Initializing application logic")
     player = mplayer.MPlayer(settings)
-    print("Starting main GUI loop")
+    LOGGER.info("Application logic initialized. Entering main event loop.")
     root.mainloop()
+    LOGGER.info("Exited event loop. Terminating application logic.")
     player.terminate()
+    LOGGER.info("Gracefully terminated application. Exiting.")
 
 
 if __name__ == "__main__":
