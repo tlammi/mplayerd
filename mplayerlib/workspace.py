@@ -48,7 +48,7 @@ class Workspace:
         with open(os.path.join(slot, "mplayer.conf"), "w") as f:
             json.dump(conf.dump(), f, indent=4)
         for p in conf.playlists.values():
-            for src_abs in p.media:
+            for src_abs in p:
                 src_rel = os.path.relpath(src_abs, p.directory)
                 dst_abs = os.path.join(slot, src_rel)
                 os.makedirs(os.path.dirname(dst_abs), exist_ok=True)

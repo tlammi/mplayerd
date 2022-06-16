@@ -1,4 +1,4 @@
-
+import copy
 import json
 import os.path
 import jsonschema
@@ -33,12 +33,28 @@ class Conf(dict):
         else:
             self["schedule"] = Schedule([])
 
+    @property
+    def playlists(self):
+        return self["playlists"]
+
+    @property
+    def schedule(self):
+        return self["schedule"]
+
     @staticmethod
     def load(path: str) -> 'Conf':
         path = os.path.realpath(path)
         d = os.path.dirname(path)
         with open(path, "r") as f:
             return Conf(json.load(f), d)
+
+    def dump(self):
+        out = dict()
+        out["version"] = self["version"]
+        out["config"] = copy.deepcopy(self["config"])
+        out["playlists"] = {k: v.dump() for k, v in self.playlists.items()}
+        out["schedule"] = self.schedule.dump()
+        return out
 
 
 def parse_conf(path: str) -> Conf:

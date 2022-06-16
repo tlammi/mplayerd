@@ -15,6 +15,16 @@ class Schedule(list):
         for i, (t, v) in enumerate(self):
             self[i] = (timeutil.to_datetime(t), v)
 
+        def key(pair):
+            return pair[0]
+        self.sort(key=key)
+
+    def dump(self):
+        out = []
+        for t, v in self:
+            out.append((t.timestamp(), v))
+        return out
+
 ##class _ScheduleIter:
 ##    def __init__(self, sched):
 ##        self._iter = iter(sched)

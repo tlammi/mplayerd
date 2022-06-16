@@ -15,3 +15,12 @@ def to_datetime(d: Date) -> datetime:
     if isinstance(d, int):
         return datetime.fromtimestamp(d)
     raise TypeError()
+
+
+def to_string(d: Date) -> str:
+    if isinstance(d, int):
+        d = to_datetime(d)
+    if isinstance(d, datetime):
+        return d.strftime(_FORMAT)
+    if isinstance(d, str):
+        return d
