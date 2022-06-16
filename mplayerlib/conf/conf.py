@@ -1,83 +1,43 @@
 
 import json
 import os.path
-
 import jsonschema
+
+from typing import Union
+
 from . import schema
-from .uri import Uri
+from . import uri
 from .playlist import Playlist
 from .schedule import Schedule
 
 
-class Conf:
+class Conf(dict):
     """
     Root configuration object
-
     """
 
-    def __init__(self, d: dict, directory: str, name: str):
-        """
-        Create a new configuration object
+    def __init__(self, d: dict, directory: str):
+        super().__init__(**d)
+        jsonschema.validate(self, schema=schema.CONF)
 
-        :param d: Deserialized data
-        :param directory: Directory which contained the file. Used for relative references
-            Relative imports do not work without this
-        """
-        jsonschema.validate(d, schema=schema.CONF)
-        self.playlists = {}
-        self.schedule = Schedule([])
-        # Directory containing config
-        self.parent = directory
-        # Config file name
-        self.name = name
-
-        self._c = d["config"]
-        if "playlist-default" in self._c:
-            playlist_config = self._c["playlist-default"]
-        else:
-            playlist_config = {}
-
-        for k, v in d["playlists"].items():
+        for k, v in self["playlists"].items():
             if isinstance(v, str):
-                v = Uri.parse(v, directory)
-            self.playlists[k] = Playlist(v, directory, playlist_config)
-
-        if "schedule" in d:
-            v = d["schedule"]
-            if isinstance(v, str):
-                v = Uri.parse(v, directory)
-            self.schedule = Schedule(v)
-
-    def dump(self) -> dict:
-        out = {
-            "version": 0,
-            "config": self._c,
-            "playlists": {k: p.dump() for k, p in self.playlists.items()},
-            "schedule": self.schedule.dump()
-        }
-        return out
+                scheme, resource = uri.parse(v)
+                if scheme == "inc":
+                    p = os.path.join(directory, resource)
+                    self["playlists"][k] = Playlist.load(p)
+            else:
+                self["playlists"][k] = Playlist(v, directory)
 
     @staticmethod
-    def load(path: str):
-        """
-        Load configuration from a file
-
-        :param path: Path to configuration file
-        :return: Config object constructed from the file
-        """
-        d = os.path.realpath(os.path.dirname(path))
-        n = os.path.basename(path)
+    def load(path: str) -> 'Conf':
+        path = os.path.realpath(path)
+        d = os.path.dirname(path)
         with open(path, "r") as f:
-            return Conf(json.load(f), d, n)
+            return Conf(json.load(f), d)
 
-    def __eq__(self, other: 'Conf'):
-        if self._c != other._c:
-            return False
-        if self.playlists != other.playlists:
-            return False
-        if self.schedule != other.schedule:
-            return False
-        return True
 
-    def __ne__(self, other):
-        return not self.__eq__(other)
+def parse_conf(path: str) -> Conf:
+    dname = os.path.dirname(path)
+    with open(path, "r") as f:
+        return Conf(json.load(f), dname)

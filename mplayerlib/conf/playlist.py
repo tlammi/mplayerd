@@ -5,98 +5,47 @@ import jsonschema
 import glob
 import os
 
-from typing import Union
-from .uri import Uri
+from datetime import datetime
+from dataclasses import dataclass
+from typing import Union, List
+from . import uri
 from . import schema
+from .media import Media
 from .. import media
 
 
-class Playlist(media.Src):
+class Playlist(list):
 
-    def __init__(self, playlist: Union[Uri, dict, list], directory: str, default_config: dict = None):
-        """
-        Init
-
-        :param playlist:
-        :param directory: Path to containing directory. Used for relative globs
-        :param default_config: Configuration options to use in case no internal config is specified
-        """
-        self.media = []
-        self.directory = directory
-        default_config = default_config or {}
-        if isinstance(playlist, Uri):
-            if playlist.scheme == "glob":
-                self._init_glob(playlist.resource)
-            elif playlist.scheme == "inc":
-                with open(playlist.resource) as f:
-                    self._init_obj(json.load(f))
-            else:
-                raise ValueError(f"Unsupported scheme: {playlist.scheme}")
-        elif isinstance(playlist, list):
-            self.media = [os.path.realpath(os.path.join(self.directory, i)) for i in playlist]
+    def __init__(self, l: Union[list, str, dict], directory: str):
+        super().__init__()
+        if isinstance(l, list):
+            for e in l:
+                self._add_entry(e, directory)
         else:
-            self._init_obj(playlist)
-        self._iter = iter(self.media)
-        if "loop" in default_config:
-            self._loop = default_config["loop"]
+            self._add_entry(l, directory)
 
-    def __copy__(self):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-        return result
+    def _add_entry(self, e: Union[str, dict], d: str):
+        if isinstance(e, str):
+            scheme, resource = uri.parse(e)
+            if scheme == "glob":
+                tmp = glob.glob(resource, recursive=True, root_dir=d)
+                tmp = [Media(os.path.join(d, t)) for t in tmp]
+                self.extend(tmp)
+            elif scheme is None:
+                self.append(Media(os.path.join(d, resource)))
+            else:
+                raise ValueError(f"unsupported scheme: {scheme}")
+        elif isinstance(e, dict):
+            m = os.path.join(d, e["media"])
+            a = e.get("after", 0)
+            b = e.get("before", datetime.max)
+            self.append(Media(m, after=a, before=b))
+        else:
+            raise TypeError()
 
-    def __deepcopy__(self, memodict={}):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memodict[id(self)] = result
-        for k, v in self.__dict__.items():
-            setattr(result, k, copy.deepcopy(v, memodict))
-        return result
-
-    def dump(self) -> list:
-        """
-        """
-        return [os.path.relpath(m, self.directory) for m in self.media]
-
-    def next(self) -> str:
-        try:
-            return next(self._iter)
-        except StopIteration:
-            if self._loop:
-                self._iter = iter(self.media)
-                return next(self._iter)
-
-    def _init_glob(self, glob_str: str):
-        self.media = glob.glob(glob_str, recursive=True, root_dir=self.directory)
-
-    def _init_obj(self, playlist: dict):
-        # TODO: Implement
-        jsonschema.validate(playlist, schema=schema.PLAYLIST)
-
-    def __eq__(self, other: 'Playlist'):
-        """
-        Compare if two playlists are equal
-
-        Returns True if the playlists contain the same relative paths
-        and files referenced by the paths are equal.
-        """
-        print("comparing playlist")
-        if self._loop != other._loop:
-            return False
-        my = [os.path.relpath(p, self.directory) for p in self.media]
-        my.sort()
-        others = [os.path.relpath(p, other.directory) for p in other.media]
-        others.sort()
-        if my != others:
-            print(f"my:{my}, others:{others}")
-            return False
-        for m, o in zip(self.media, other.media):
-            if not filecmp.cmp(m, o):
-                print(f"files: {m} and {o} were different")
-                return False
-        print("playlist equal")
-        return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
+    @staticmethod
+    def load(path: str):
+        path = os.path.realpath(path)
+        d = os.path.dirname(path)
+        with open(path, "r") as f:
+            return Playlist(json.load(f), d)
