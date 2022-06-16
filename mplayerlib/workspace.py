@@ -1,9 +1,12 @@
 import json
 import os
 import shutil
+import logging
 from typing import Union
 
 from .conf import Conf
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Workspace:
@@ -25,13 +28,13 @@ class Workspace:
     def __init__(self, work_path: str):
         """
         :param work_path: Path to workspace. Directory path is populated recursively if it does not exist
-        :param conf: Config loaded from the source directory
         """
         os.makedirs(work_path, exist_ok=True)
         self._work_path = work_path
         self._a = os.path.join(self._work_path, "a")
         self._b = os.path.join(self._work_path, "b")
         self._active = self._b
+        LOGGER.info("Workspace initialized")
 
     def load(self, conf: Union[Conf, str]):
         """
@@ -41,7 +44,9 @@ class Workspace:
         :return:
         """
         if isinstance(conf, str):
+            LOGGER.info("Loading config from %s", conf)
             conf = Conf.load(conf)
+        LOGGER.debug("Config was %s", conf.dump())
         slot = self._next()
         shutil.rmtree(slot, ignore_errors=True)
         os.makedirs(slot, exist_ok=True)

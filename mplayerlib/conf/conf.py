@@ -1,7 +1,8 @@
 import copy
 import json
+import logging
 import os.path
-import jsonschema
+import logging
 
 from typing import Union
 
@@ -9,6 +10,8 @@ from . import schema
 from . import uri
 from .playlist import Playlist
 from .schedule import Schedule
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Conf(dict):
@@ -19,7 +22,6 @@ class Conf(dict):
     def __init__(self, d: dict, directory: str):
         super().__init__(**d)
         self.directory = os.path.realpath(directory)
-        #jsonschema.validate(self, schema=schema.CONF)
 
         for k, v in self["playlists"].items():
             if isinstance(v, str):

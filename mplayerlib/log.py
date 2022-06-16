@@ -14,7 +14,7 @@ class _Handler(logging.Handler):
     def emit(self, record: logging.LogRecord) -> None:
         t = datetime.datetime.now()
         datestr = t.strftime("%d.%m %H:%M:%S")
-        msg = f"{datestr} >  {record.msg}\n"
+        msg = f"{datestr} >  {record.getMessage()}\n"
         if record.levelno >= logging.ERROR:
             with open(self._e, "a") as f:
                 f.write(msg)

@@ -22,6 +22,7 @@ def parse_cli():
     p.add_argument("-r", "--reload", help="Config reload interval in seconds. Default: 120", type=int, default=120)
     p.add_argument("source",
                    help="Path to configuration where to start.")
+    p.add_argument("--debug", action="store_true")
     ns = p.parse_args(sys.argv[1:])
     if not ns.frontend:
         ns.frontend = ["dump"]
@@ -30,7 +31,8 @@ def parse_cli():
 
 def main():
     args = parse_cli()
-    mplayerlib.log.init(os.path.dirname(args.source))
+    level = logging.DEBUG if args.debug else logging.INFO
+    mplayerlib.log.init(os.path.dirname(args.source), level)
     LOGGER.info("Initializing mplayerd library")
     root = tkinter.Tk()
     settings = mplayer.Settings(root, args.source, args.workspace, args.frontend, args.reload)
