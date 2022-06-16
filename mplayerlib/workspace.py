@@ -49,10 +49,10 @@ class Workspace:
             json.dump(conf.dump(), f, indent=4)
         for p in conf.playlists.values():
             for src_abs in p:
-                src_rel = os.path.relpath(src_abs, p.directory)
+                src_rel = os.path.relpath(src_abs.media, conf.directory)
                 dst_abs = os.path.join(slot, src_rel)
                 os.makedirs(os.path.dirname(dst_abs), exist_ok=True)
-                shutil.copy2(src_abs, dst_abs, follow_symlinks=True)
+                shutil.copy2(src_abs.media, dst_abs, follow_symlinks=True)
         self._active = slot
         path = os.path.join(slot, "mplayer.conf")
         return Conf.load(path)

@@ -18,13 +18,14 @@ class Conf(dict):
 
     def __init__(self, d: dict, directory: str):
         super().__init__(**d)
-        jsonschema.validate(self, schema=schema.CONF)
+        self.directory = os.path.realpath(directory)
+        #jsonschema.validate(self, schema=schema.CONF)
 
         for k, v in self["playlists"].items():
             if isinstance(v, str):
                 scheme, resource = uri.parse(v)
                 if scheme == "inc":
-                    p = os.path.join(directory, resource)
+                    p = os.path.join(self.directory, resource)
                     self["playlists"][k] = Playlist.load(p)
             else:
                 self["playlists"][k] = Playlist(v, directory)
