@@ -89,6 +89,8 @@ class VlcPlayer(Player):
                     return
                 try:
                     media = self._src.next()
+                    if media is None:
+                        return
                 except StopIteration:
                     # No media available
                     return

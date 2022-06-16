@@ -27,6 +27,8 @@ class Conf(dict):
                 if scheme == "inc":
                     p = os.path.join(self.directory, resource)
                     self["playlists"][k] = Playlist.load(p)
+                else:
+                    self["playlists"][k] = Playlist(v, directory)
             else:
                 self["playlists"][k] = Playlist(v, directory)
         if "schedule" in self:
@@ -50,6 +52,7 @@ class Conf(dict):
             return Conf(json.load(f), d)
 
     def dump(self):
+        print(f"dumping: {self=}")
         out = dict()
         out["version"] = self["version"]
         out["config"] = copy.deepcopy(self["config"])

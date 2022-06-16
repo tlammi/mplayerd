@@ -18,19 +18,21 @@ class Playlist(list):
 
     def __init__(self, l: Union[list, str, dict], directory: str):
         super().__init__()
-        print(f"initializing playlist {l}")
         if isinstance(l, list):
             for e in l:
                 self._add_entry(e, directory)
         else:
             self._add_entry(l, directory)
+        self._iter = iter(self)
 
     def _add_entry(self, e: Union[str, dict], d: str):
         if isinstance(e, str):
             scheme, resource = uri.parse(e)
             print(f"{scheme=}, {resource=}")
             if scheme == "glob":
+                print(f"root dir: {d=}")
                 tmp = glob.glob(resource, recursive=True, root_dir=d)
+                print(f"glob: {tmp=}")
                 tmp = [Media(os.path.join(d, t)) for t in tmp]
                 self.extend(tmp)
             elif scheme is None:
@@ -55,6 +57,20 @@ class Playlist(list):
         d = os.path.dirname(path)
         with open(path, "r") as f:
             return Playlist(json.load(f), d)
+
+    def next(self):
+        stopped = False
+        while True:
+            try:
+                m = next(self._iter)
+                if m.active():
+                    return m.media
+            except StopIteration:
+                if stopped:
+                    # Avoid infinite loop
+                    return None
+                stopped = True
+                self._iter = iter(self)
 
     def dump(self):
         out = []
