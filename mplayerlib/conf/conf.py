@@ -28,6 +28,10 @@ class Conf(dict):
                     self["playlists"][k] = Playlist.load(p)
             else:
                 self["playlists"][k] = Playlist(v, directory)
+        if "schedule" in self:
+            self["schedule"] = Schedule(self["schedule"])
+        else:
+            self["schedule"] = Schedule([])
 
     @staticmethod
     def load(path: str) -> 'Conf':
