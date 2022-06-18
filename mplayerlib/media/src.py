@@ -17,3 +17,9 @@ class Src(abc.ABC):
         :return: Path to the next media to play
         :raise: StopIteration on end of media
         """
+
+    @abc.abstractmethod
+    def __bool__(self) -> bool:
+        """
+        :return: True if not empty or False
+        """

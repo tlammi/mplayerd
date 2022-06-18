@@ -14,7 +14,7 @@ from .media import Media
 from .. import media
 
 
-class Playlist(list):
+class Playlist(list, media.Src):
 
     def __init__(self, l: Union[list, str, dict], directory: str):
         super().__init__()
@@ -50,6 +50,9 @@ class Playlist(list):
             self.append(Media(m, after=a, before=b))
         else:
             raise TypeError()
+
+    def __bool__(self):
+        return len(self) != 0
 
     @staticmethod
     def load(path: str):
