@@ -4,9 +4,8 @@ import logging
 import os.path
 import logging
 
-from typing import Union
+from typing import List
 
-from . import schema
 from . import uri
 from .playlist import Playlist
 from .schedule import Schedule
@@ -51,7 +50,22 @@ class Conf(dict):
         path = os.path.realpath(path)
         d = os.path.dirname(path)
         with open(path, "r") as f:
-            return Conf(json.load(f), d)
+            c = Conf(json.load(f), d)
+        errs = c._errors()
+        if errs:
+            raise ValueError(f"Validation errors in config: {errs}")
+        return c
+
+    def _errors(self) -> List[str]:
+        """
+        Run configuration checks and return found errors
+        :return: Empty list if no errors, either list of errors found
+        """
+        errs = []
+        for _, playlist_name in self.schedule:
+            if playlist_name not in self.playlists:
+                errs.append(f"Schedule contains non-existent playlist '{playlist_name}'")
+        return errs
 
     def dump(self):
         print(f"dumping: {self=}")
