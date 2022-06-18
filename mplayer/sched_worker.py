@@ -1,6 +1,7 @@
 import threading
 import logging
 from typing import List
+from datetime import datetime
 
 import mplayerlib
 
@@ -59,10 +60,12 @@ class SchedWorker:
                 conf = self._conf
                 dur, playlist = sched.next()
                 if dur is not None:
+                    tpoint = datetime.now() + dur
+                    LOGGER.info(f"Next playlist '{playlist}' after '{dur}' which is at '{tpoint}'")
                     notified = self._cv.wait(dur.total_seconds())
                 else:
-                    self._cv.wait()
                     LOGGER.info("No more events left in schedule")
+                    self._cv.wait()
                     notified = True
                 if notified:
                     if not self._operate:
