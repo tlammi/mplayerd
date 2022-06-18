@@ -60,8 +60,9 @@ class SchedWorker:
                 if dur is not None:
                     notified = self._cv.wait(dur.total_seconds())
                 else:
-                    LOGGER.info("No more events left in schedule. Quiting scheduler.")
-                    break
+                    self._cv.wait()
+                    LOGGER.info("No more events left in schedule")
+                    notified = True
                 if notified:
                     if not self._operate:
                         break
