@@ -18,8 +18,12 @@ class Conf(dict):
     Root configuration object
     """
 
-    def __init__(self, d: dict, directory: str):
-        super().__init__(**d)
+    def __init__(self, d: dict = None, directory: str = None):
+        super().__init__(**(d or dict()))
+        if d is None:
+            self["playlists"] = dict()
+            self["schedule"] = Schedule([])
+            return
         self.directory = os.path.realpath(directory)
 
         for k, v in self["playlists"].items():

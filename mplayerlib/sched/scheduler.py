@@ -74,7 +74,7 @@ class Scheduler:
         t = timedelta(seconds=t)
         try:
             return [v for v in self._sched if v[0] < t][-1][1]
-        except KeyError:
+        except (KeyError, IndexError):
             return None
 
     def next(self, override_clock=None):

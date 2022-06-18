@@ -1,12 +1,15 @@
 
 import tkinter
-import os
+import logging
+import traceback
 
 from dataclasses import dataclass
 
 import mplayerlib
 from .sched_worker import SchedWorker
 from .timer import Timer
+
+LOGGER = logging.getLogger(__name__)
 
 
 @dataclass
@@ -31,7 +34,11 @@ class MPlayer:
     def __init__(self, settings: Settings):
         self._conf_path = settings.source_path
         self._ws = mplayerlib.Workspace(settings.work_path)
-        self._conf = self._ws.load(self._conf_path)
+        try:
+            self._conf = self._ws.load(self._conf_path)
+        except Exception:
+            LOGGER.error(f"Failed to load config: '{traceback.format_exc()}'. Trying again later.")
+            self._conf = mplayerlib.conf.Conf()
         self._fronts = [mplayerlib.media.player(f, settings.tk) for f in settings.frontends]
         for f in self._fronts:
             f.play()
@@ -43,12 +50,15 @@ class MPlayer:
         self._reloader.cancel()
 
     def _handle_config_reload(self):
-        print("Reloading configuration")
-        new_conf = mplayerlib.conf.Conf.load(self._conf_path)
-        if new_conf != self._conf:
-            print("Configs changed. Refreshing...")
-            self._conf = self._ws.load(self._conf_path)
-            self._sched.update_conf(self._conf)
-            print("Refreshed")
-        else:
-            print("Configs did not change. Doing nothing")
+        try:
+            new_conf = mplayerlib.conf.Conf.load(self._conf_path)
+            if new_conf != self._conf:
+                print("Configs changed. Refreshing...")
+                self._conf = self._ws.load(self._conf_path)
+                self._sched.update_conf(self._conf)
+                print("Refreshed")
+            else:
+                print("Configs did not change. Doing nothing")
+        except Exception as e:
+            LOGGER.error(f"Failed to load config: '{e.with_traceback(None)}'. Continuing with old setup")
+            pass

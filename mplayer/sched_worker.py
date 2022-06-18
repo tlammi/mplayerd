@@ -20,8 +20,9 @@ class SchedWorker:
         self._operate = True
 
         previous = self._sched.last_expired()
-        for f in self._fronts:
-            f.set_media_source(self._conf.playlists[previous])
+        if previous:
+            for f in self._fronts:
+                f.set_media_source(self._conf.playlists[previous])
 
         self._t = threading.Thread(target=self._work)
         self._t.start()
