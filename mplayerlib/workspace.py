@@ -46,7 +46,7 @@ class Workspace:
         if isinstance(conf, str):
             LOGGER.info("Loading config from %s", conf)
             conf = Conf.load(conf)
-        LOGGER.debug("Config was %s", conf.dump())
+        LOGGER.info("Config was %s", conf.dump())
         slot = self._next()
         shutil.rmtree(slot, ignore_errors=True)
         os.makedirs(slot, exist_ok=True)

@@ -1,3 +1,4 @@
+import logging
 import sys
 
 import vlc
@@ -7,6 +8,8 @@ import time
 import enum
 from .player import Player
 from .src import Src
+
+LOGGER = logging.getLogger(__name__)
 
 
 class OsType(enum.Enum):
@@ -102,7 +105,7 @@ class VlcPlayer(Player):
             pass
 
     def _media_ended_callback(self, _):
-        print(f"Event received. Time since start: {time.time() - self._start}s")
+        LOGGER.debug(f"VLC: Media end event received. Time since start: {time.time() - self._start}s")
         try:
             self._root.after(0, self._play_media)
         except RuntimeError:

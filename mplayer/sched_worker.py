@@ -31,7 +31,7 @@ class SchedWorker:
         """
         Set the worker schedule to a new configuration
         """
-        print("Updating configuration")
+        LOGGER.debug("Updating schedule configuration")
         with self._cv:
             self._conf = conf
             self._sched = mplayerlib.sched.Scheduler(conf.schedule)

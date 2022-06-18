@@ -53,12 +53,12 @@ class MPlayer:
         try:
             new_conf = mplayerlib.conf.Conf.load(self._conf_path)
             if new_conf != self._conf:
-                print("Configs changed. Refreshing...")
+                LOGGER.info("Configs changed. Refreshing...")
                 self._conf = self._ws.load(self._conf_path)
                 self._sched.update_conf(self._conf)
-                print("Refreshed")
+                LOGGER.debug("Refreshed")
             else:
-                print("Configs did not change. Doing nothing")
+                LOGGER.debug("Configs did not change. Doing nothing")
         except Exception as e:
             LOGGER.error(f"Failed to load config: '{e.with_traceback(None)}'. Continuing with old setup")
             pass

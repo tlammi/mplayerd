@@ -28,11 +28,8 @@ class Playlist(list, media.Src):
     def _add_entry(self, e: Union[str, dict], d: str):
         if isinstance(e, str):
             scheme, resource = uri.parse(e)
-            print(f"{scheme=}, {resource=}")
             if scheme == "glob":
-                print(f"root dir: {d=}")
                 tmp = glob.glob(resource, recursive=True, root_dir=d)
-                print(f"glob: {tmp=}")
                 tmp = [Media(os.path.join(d, t)) for t in tmp]
                 self.extend(tmp)
             elif scheme is None:

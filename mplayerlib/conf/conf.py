@@ -72,7 +72,6 @@ class Conf(dict):
         return errs
 
     def dump(self):
-        print(f"dumping: {self=}")
         out = dict()
         out["version"] = self["version"]
         out["config"] = copy.deepcopy(self["config"])
