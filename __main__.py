@@ -39,7 +39,11 @@ def main():
     LOGGER.info("Library created. Initializing application logic")
     player = mplayer.MPlayer(settings)
     LOGGER.info("Application logic initialized. Entering main event loop.")
-    root.mainloop()
+    try:
+        root.mainloop()
+    except KeyboardInterrupt:
+        LOGGER.info("Got keyboard interrupt. Terminating...")
+        root.destroy()
     LOGGER.info("Exited event loop. Terminating application logic.")
     player.terminate()
     LOGGER.info("Gracefully terminated application. Exiting.")
