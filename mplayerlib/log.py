@@ -32,7 +32,7 @@ class _Handler(logging.Handler):
                 f.write(msg)
         with open(self._l, "a") as f:
             f.write(msg)
-        print(msg)
+        print(msg, end="")
 
 
 def init(outdir: str, level=logging.INFO, log_name="mplayerd"):
