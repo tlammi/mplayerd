@@ -1,7 +1,10 @@
 import threading
+import logging
 from typing import List
 
 import mplayerlib
+
+LOGGER = logging.getLogger(__name__)
 
 
 class SchedWorker:
@@ -54,7 +57,11 @@ class SchedWorker:
                 sched = self._sched
                 conf = self._conf
                 dur, playlist = sched.next()
-                notified = self._cv.wait(dur)
+                if dur is not None:
+                    notified = self._cv.wait(dur.total_seconds())
+                else:
+                    LOGGER.info("No more events left in schedule. Quiting scheduler.")
+                    break
                 if notified:
                     if not self._operate:
                         break
