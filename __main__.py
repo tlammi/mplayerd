@@ -41,8 +41,14 @@ def main():
     LOGGER.info("Library created. Initializing application logic")
     player = mplayer.MPlayer(settings)
     LOGGER.info("Application logic initialized. Entering main event loop.")
-    if args.fullscreen:
-        root.attributes("-fullscreen", True)
+
+    root.attributes("-fullscreen", args.fullscreen)
+
+    def toggle_fullscreen(_):
+        args.fullscreen = not args.fullscreen
+        root.attributes("-fullscreen", args.fullscreen)
+
+    root.bind("<space>", toggle_fullscreen)
     try:
         root.mainloop()
     except KeyboardInterrupt:
