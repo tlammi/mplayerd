@@ -14,18 +14,20 @@ LOGGER = logging.getLogger("")
 def parse_cli():
     p = argparse.ArgumentParser("mplayerd", description="Daemon for playing media")
     players = mplayerlib.media.supported_players()
+    frontend_default = ["vlc"]
     default_workspace = "/tmp/mplayerd-workspace"
     p.add_argument("-f,", "--frontend",
-                   help=f"Frontend(s) to use: {players}. Default: ['dump']", action="append")
+                   help=f"Frontend(s) to use: {players}. Default: {frontend_default}", action="append")
     p.add_argument("-w", "--workspace",
                    help=f"Set workspace path. Default {default_workspace}", default=default_workspace)
     p.add_argument("-r", "--reload", help="Config reload interval in seconds. Default: 120", type=int, default=120)
     p.add_argument("source",
                    help="Path to configuration where to start.")
-    p.add_argument("--debug", action="store_true")
+    p.add_argument("--debug", action="store_true", help="More prints")
+    p.add_argument("--fullscreen", action="store_true", help="Run window in fullscreen mode")
     ns = p.parse_args(sys.argv[1:])
     if not ns.frontend:
-        ns.frontend = ["dump"]
+        ns.frontend = frontend_default
     return ns
 
 
@@ -39,6 +41,8 @@ def main():
     LOGGER.info("Library created. Initializing application logic")
     player = mplayer.MPlayer(settings)
     LOGGER.info("Application logic initialized. Entering main event loop.")
+    if args.fullscreen:
+        root.attributes("-fullscreen", True)
     try:
         root.mainloop()
     except KeyboardInterrupt:
