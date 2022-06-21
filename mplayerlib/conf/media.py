@@ -36,4 +36,4 @@ class Media(dict):
         :return:
         """
         t = clock()
-        return self.after < t < self.before
+        return self.after < t <= self.before
