@@ -1,0 +1,14 @@
+[Unit]
+Description=Media Player Daemon
+Documentation=TBA
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=python3 %h/.local/bin/mplayerd %h/mplayerd
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
