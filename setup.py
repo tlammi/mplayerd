@@ -10,5 +10,5 @@ setup(
         "mplayerlib.sched", "mplayer"],
     scripts=["bin/mplayerd"],
     description="Media player daemon",
-    install_requires=["python-vlc >= 3.0.0"]
+    install_requires=["python-vlc >= 3.0.0", "jsonschema >= 4.6.0"]
 )
