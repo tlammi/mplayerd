@@ -24,7 +24,7 @@ def parse_cli():
     p.add_argument("source",
                    help="Path to configuration where to start.")
     p.add_argument("--debug", action="store_true", help="More prints")
-    p.add_argument("--fullscreen", action="store_true", help="Run window in fullscreen mode")
+    p.add_argument("--fullscreen", action="store_true", help="Run window in fullscreen mode. You can use space to toggle fullscreen during operation")
     ns = p.parse_args(sys.argv[1:])
     if not ns.frontend:
         ns.frontend = frontend_default
