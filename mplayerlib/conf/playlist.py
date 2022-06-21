@@ -37,14 +37,23 @@ class Playlist(list, media.Src):
             else:
                 raise ValueError(f"unsupported scheme: {scheme}")
         elif isinstance(e, dict):
-            scheme, resource = uri.parse(e["media"])
-            if scheme == "glob" or scheme is None:
-                m = os.path.join(d, resource)
-            else:
+            e_media = e["media"]
+            if isinstance(e_media, str):
+                e_media = [e_media]
+            if not isinstance(e_media, list):
                 raise TypeError()
-            a = e.get("after", 0)
-            b = e.get("before", datetime.max)
-            self.append(Media(m, after=a, before=b))
+            for em in e_media:
+                scheme, resource = uri.parse(em)
+                a = e.get("after", 0)
+                b = e.get("before", datetime.max)
+                if scheme == "glob":
+                    tmp = glob.glob(resource, recursive=True, root_dir=d)
+                    tmp = [Media(os.path.join(d, t), after=a, before=b) for t in tmp]
+                    self.extend(tmp)
+                elif scheme is None:
+                    self.append(Media(os.path.join(d, resource), after=a, before=b))
+                else:
+                    raise ValueError(f"Unsupported scheme: '{scheme}'")
         else:
             raise TypeError()
 
