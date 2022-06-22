@@ -18,11 +18,12 @@ class Playlist(list, media.Src):
 
     def __init__(self, l: Union[list, str, dict], directory: str):
         super().__init__()
+        self._directory = directory
         if isinstance(l, list):
             for e in l:
-                self._add_entry(e, directory)
+                self._add_entry(e, self._directory)
         else:
-            self._add_entry(l, directory)
+            self._add_entry(l, self._directory)
         self._iter = iter(self)
 
     def _add_entry(self, e: Union[str, dict], d: str):
@@ -85,7 +86,8 @@ class Playlist(list, media.Src):
         out = []
         for m in self:
             a = int(m.after.timestamp())
-            d = {"media": m.media, "after": a}
+            media = os.path.relpath(m.media, self._directory)
+            d = {"media": media, "after": a}
             try:
                 # max() might overflow -> do not serialize
                 b = int(m.before.timestamp())
