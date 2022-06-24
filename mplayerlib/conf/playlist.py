@@ -103,3 +103,18 @@ class Playlist(list, media.Src):
         :return:
         """
         return [m.media for m in self if m.active()]
+
+    def __eq__(self, other: 'Playlist'):
+        if not isinstance(other, Playlist):
+            return False
+        if len(self) != len(other):
+            return False
+
+        for l, r in zip(self, other):
+            l_rel = os.path.relpath(l.media, self._directory)
+            r_rel = os.path.relpath(r.media, other._directory)
+            if l_rel != r_rel:
+                return False
+            if not filecmp.cmp(l.media, r.media):
+                return False
+        return True

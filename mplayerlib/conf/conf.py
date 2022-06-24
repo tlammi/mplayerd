@@ -79,6 +79,11 @@ class Conf(dict):
         out["schedule"] = self.schedule.dump()
         return out
 
+    def __eq__(self, other):
+        if not isinstance(other, Conf):
+            return False
+        return self.playlists == other.playlists and self.schedule == other.schedule
+
 
 def parse_conf(path: str) -> Conf:
     dname = os.path.dirname(path)
