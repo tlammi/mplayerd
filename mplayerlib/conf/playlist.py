@@ -62,11 +62,13 @@ class Playlist(list, media.Src):
         return len(self) != 0
 
     @staticmethod
-    def load(path: str):
+    def load(path: str, root: str = None):
+        if not root:
+            root = os.path.realpath(path)
+            root = os.path.dirname(root)
         path = os.path.realpath(path)
-        d = os.path.dirname(path)
         with open(path, "r") as f:
-            return Playlist(json.load(f), d)
+            return Playlist(json.load(f), root)
 
     def next(self):
         stopped = False

@@ -35,7 +35,7 @@ class Conf(dict):
                     # NOTE: incs ignore "root" key
                     p = os.path.join(directory, resource)
                     LOGGER.info("Loading playlist from %s", p)
-                    self["playlists"][k] = Playlist.load(p)
+                    self["playlists"][k] = Playlist.load(p, self.directory)
                 else:
                     self["playlists"][k] = Playlist(v, self.directory)
             else:
